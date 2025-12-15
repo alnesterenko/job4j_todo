@@ -1,3 +1,0 @@
-INSERT INTO tasks (title, description, created, done) VALUES ('Добавить в таблицу данные', 'Добавить в таблицу tasks несколько записей', '2025-12-10T05:10:13', FALSE);
-INSERT INTO tasks (title, description, created, done) VALUES ('Настроить liquibase', 'Изменить три файла настроек liquibase', '2025-12-10T05:10:15', FALSE);
-INSERT INTO tasks (title, description, created, done) VALUES ('Сделать коммит', 'Успеть сделать коммит, до того как выключат свет', '2025-12-10T05:10:17', FALSE);

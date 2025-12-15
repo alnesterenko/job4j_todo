@@ -35,6 +35,12 @@ public class Task {
         this.created = created;
     }
 
+    public Task(String title, String description, boolean done) {
+        this.title = title;
+        this.description = description;
+        this.done = done;
+    }
+
     public Task(String title, String description, LocalDateTime created, boolean done) {
         this.title = title;
         this.description = description;
