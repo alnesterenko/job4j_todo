@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="fragments/header :: header"></head>
+<body>
+<!-- Пока что так.  -->
+<div class="mb-3 row d-flex justify-content-start">
+    <div class="col-6"></div>
+    <div class="row">
+        <div class="col-6">
+            <a class="btn btn-primary w-200" th:href="@{/tasks/create}">Добавить задание</a>
+        </div>
+    </div>
+    <a class="nav-item nav-link active" href="/">Все задачи</a>
+    <a class="nav-item nav-link active" th:href="@{/tasks/false}">Не завершённые</a>
+    <a class="nav-item nav-link active" th:href="@{/tasks/true}">Завершённые</a>
+</div>
+<!--  -->
+<div class="container">
+    <div class="row">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Название</th>
+                <th scope="col">Описание</th>
+                <th scope="col">Дата создания</th>
+                <th scope="col">Завершено</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Временное решение чтобы посмотреть как это выглядит -->
+            <tr>
+                <td>1</td>
+                <td>Доделать вьюшку списка задач</td>
+                <td>Доделать вьюшку списка задач и залить на ГитХаб.</td>
+                <td>2025-12-16T05:46:15</td>
+                <td>
+                    <span>
+                <i class="bi bi-check-square"></i><!-- Завершённая задача -->
+              </span>
+
+                </td>
+            </tr>
+            <!--  -->
+            <tr th:each="task: ${tasks}">
+                <td th:text="${task.id}"/>
+                <td th:text="${task.title}"/>
+                <td th:text="${task.description}"/>
+                <!-- Чтобы дата выводилась в "красивом" формате нужно добавить ещё одни скобки -->
+                <td th:text="${{task.created}}"/>
+                <td>
+                    <!-- Аналог if-else -->
+                    <span th:if="${task.done}">
+                <i class="bi bi-check-square"></i><!-- Завершённая задача -->
+              </span>
+                    <span th:if="${!task.done}">
+                  <i class="bi bi-square"></i><!-- Не завершённая задача -->
+              </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div th:include="fragments/footer :: footer"></div>
+</body>
+</html>
