@@ -1,6 +1,7 @@
 package ru.job4j.todo.repository;
 
 import lombok.AllArgsConstructor;
+import net.jcip.annotations.ThreadSafe;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@ThreadSafe
 @Repository
 @AllArgsConstructor
 public class HbnTaskRepository implements TaskRepository, AutoCloseable {
