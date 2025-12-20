@@ -81,7 +81,7 @@ public class HbnTaskRepository implements TaskRepository, AutoCloseable {
     public List<Task> findAll() {
         List<Task> result = new ArrayList<>();
         try (Session session = this.sf.openSession()) {
-            Query<Task> query = session.createQuery("FROM Task");
+            Query<Task> query = session.createQuery("SELECT t FROM Task t ORDER BY t.id ASC");
             result = query.list();
         }
         return result;

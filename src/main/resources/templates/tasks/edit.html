@@ -4,20 +4,23 @@
 <body>
 <div th:replace="fragments/navigation :: navigation"></div>
 <div class="container">
-  <h3>Создание задачи</h3>
-  <form class="mt-3" th:action="@{/tasks/create}" method="post" th:object="${task}">
+  <h3>Редактирование задачи</h3>
+  <form class="mt-3" th:action="@{/tasks/edit}" method="post" th:object="${task}">
+    <input type="hidden" name="id" th:field="*{id}" th:value="${task.id}">
     <div class="mb-3">
       <label for="title" class="form-label"><b>Название</b></label>
       <input type="text" class="form-control" name="title" id="title"
-             placeholder="Добавить задачу">
+             placeholder="Название задачи" th:field="*{title}" th:value="${task.title}">
     </div>
     <div class="mb-3">
       <label for="description" class="form-label"><b>Описание</b></label>
       <textarea class="form-control" name="description" id="description" rows="6"
-                placeholder="Добавить подробное описание задачи"></textarea>
+                placeholder="Добавить подробное описание задачи" th:field="*{description}" th:value="${task.description}"></textarea>
     </div>
+    <!-- Нужно чтобы не заменялась дата создания -->
+    <input type="hidden" name="created" th:field="*{created}" th:value="${task.created}">
     <div class="form-check mb-3">
-      <input type="checkbox" name="done" class="form-check-input" id="done">
+      <input type="checkbox" name="done" class="form-check-input" id="done" th:field="*{done}">
       <label class="form-check-label" for="done">Завершено</label>
     </div>
     <div class="mb-3 row">

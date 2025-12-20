@@ -2,8 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:include="fragments/header :: header"></head>
 <body>
+<div th:include="fragments/navigation :: navigation"></div>
 <!-- Пока что так.  -->
-<div class="mb-3 row d-flex justify-content-start">
+<div class="my-3 row d-flex justify-content-start">
     <div class="col-6"></div>
     <div class="row">
         <div class="col-6">
@@ -11,44 +12,48 @@
         </div>
     </div>
     <a class="nav-item nav-link active" href="/">Все задачи</a>
-    <a class="nav-item nav-link active" th:href="@{/tasks/false}">Не завершённые</a>
-    <a class="nav-item nav-link active" th:href="@{/tasks/true}">Завершённые</a>
+    <a class="nav-item nav-link active" th:href="@{/tasks/done/true}">Завершённые</a>
+    <a class="nav-item nav-link active" th:href="@{/tasks/done/false}">Новые</a>
 </div>
 <!--  -->
 <div class="container">
     <div class="row">
-        <table class="table">
+        <table class="table table-hover">
             <thead>
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Название</th>
-                <th scope="col">Описание</th>
                 <th scope="col">Дата создания</th>
                 <th scope="col">Завершено</th>
             </tr>
             </thead>
             <tbody>
-            <!-- Временное решение чтобы посмотреть как это выглядит -->
+            <!-- Временное решение чтобы посмотреть как это выглядит
             <tr>
                 <td>1</td>
                 <td>Доделать вьюшку списка задач</td>
-                <td>Доделать вьюшку списка задач и залить на ГитХаб.</td>
                 <td>2025-12-16T05:46:15</td>
                 <td>
                     <span>
-                <i class="bi bi-check-square"></i><!-- Завершённая задача -->
+                <i class="bi bi-check-square"></i> Завершённая задача
               </span>
 
                 </td>
             </tr>
-            <!--  -->
+              -->
             <tr th:each="task: ${tasks}">
-                <td th:text="${task.id}"/>
-                <td th:text="${task.title}"/>
-                <td th:text="${task.description}"/>
+                <td><a th:text="${task.id}"
+                       style="display: block; text-decoration: none; color: inherit;"
+                       th:href="@{/tasks/{taskId}(taskId=${task.id})}"/></td>
+                <td><a th:text="${task.title}"
+                       style="display: block; text-decoration: none; color: inherit;"
+                       th:href="@{/tasks/{taskId}(taskId=${task.id})}"/></td>
                 <!-- Чтобы дата выводилась в "красивом" формате нужно добавить ещё одни скобки -->
-                <td th:text="${{task.created}}"/>
-                <td>
+                <td><a th:text="${{task.created}}"
+                       style="display: block; text-decoration: none; color: inherit;"
+                       th:href="@{/tasks/{taskId}(taskId=${task.id})}"/></td>
+                <td><a style="display: block; text-decoration: none; color: inherit;"
+                       th:href="@{/tasks/{taskId}(taskId=${task.id})}">
                     <!-- Аналог if-else -->
                     <span th:if="${task.done}">
                 <i class="bi bi-check-square"></i><!-- Завершённая задача -->
@@ -56,6 +61,7 @@
                     <span th:if="${!task.done}">
                   <i class="bi bi-square"></i><!-- Не завершённая задача -->
               </span>
+                </a>
                 </td>
             </tr>
             </tbody>
