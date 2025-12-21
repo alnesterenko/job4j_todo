@@ -42,11 +42,9 @@ public class HbnTaskRepository implements TaskRepository, AutoCloseable {
             var updatedLines = session.createQuery(
                             "UPDATE Task SET title = :title, "
                                     + "description = :description, "
-                                    + "created = :created, "
                                     + "done = :done  WHERE id = :id")
                     .setParameter("title", task.getTitle())
                     .setParameter("description", task.getDescription())
-                    .setParameter("created", task.getCreated())
                     .setParameter("done", task.isDone())
                     .setParameter("id", id)
                     .executeUpdate();
@@ -61,20 +59,23 @@ public class HbnTaskRepository implements TaskRepository, AutoCloseable {
     }
 
     @Override
-    public void delete(Integer id) {
+    public boolean delete(Integer id) {
+        boolean result = false;
         Session session = this.sf.openSession();
         try {
             session.beginTransaction();
-            session.createQuery(
+            var updatedLines = session.createQuery(
                             "DELETE Task WHERE id = :id")
                     .setParameter("id", id)
                     .executeUpdate();
             session.getTransaction().commit();
+            result = updatedLines > 0;
         } catch (Exception e) {
             session.getTransaction().rollback();
         } finally {
             session.close();
         }
+        return result;
     }
 
     @Override
@@ -117,6 +118,27 @@ public class HbnTaskRepository implements TaskRepository, AutoCloseable {
                     "FROM Task AS t WHERE t.done = :done", Task.class);
             query.setParameter("done", done);
             result = query.list();
+        }
+        return result;
+    }
+
+    @Override
+    public boolean switchUndoneToDone(Integer id) {
+        boolean result = false;
+        Session session = this.sf.openSession();
+        try {
+            session.beginTransaction();
+            var updatedLines = session.createQuery(
+                            "UPDATE Task SET done = :done  WHERE id = :id")
+                    .setParameter("done", true)
+                    .setParameter("id", id)
+                    .executeUpdate();
+            session.getTransaction().commit();
+            result = updatedLines > 0;
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
         }
         return result;
     }

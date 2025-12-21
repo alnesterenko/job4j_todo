@@ -29,22 +29,9 @@ public class Task {
         this.description = description;
     }
 
-    public Task(String title, String description, LocalDateTime created) {
-        this.title = title;
-        this.description = description;
-        this.created = created;
-    }
-
     public Task(String title, String description, boolean done) {
         this.title = title;
         this.description = description;
-        this.done = done;
-    }
-
-    public Task(String title, String description, LocalDateTime created, boolean done) {
-        this.title = title;
-        this.description = description;
-        this.created = created;
         this.done = done;
     }
 

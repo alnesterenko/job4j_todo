@@ -11,7 +11,7 @@ public interface TaskRepository extends AutoCloseable {
 
     boolean replace(Integer id, Task task);
 
-    void delete(Integer id);
+    boolean delete(Integer id);
 
     List<Task> findAll();
 
@@ -20,4 +20,6 @@ public interface TaskRepository extends AutoCloseable {
     Optional<Task> findById(Integer id);
 
     List<Task> findAllByDone(boolean done);
+
+    boolean switchUndoneToDone(Integer id);
 }

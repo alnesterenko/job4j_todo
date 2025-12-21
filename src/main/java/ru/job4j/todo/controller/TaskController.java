@@ -4,7 +4,6 @@ import net.jcip.annotations.ThreadSafe;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.service.TaskService;
 
@@ -74,9 +73,8 @@ public class TaskController {
         return "tasks/edit";
     }
 
-    @PostMapping({"/one", "/edit"})
+    @PostMapping("/edit")
     public String update(@ModelAttribute Task task, Model model) {
-        System.out.println(task);
         try {
             var isUpdated = taskService.replace(task.getId(), task);
             if (!isUpdated) {
@@ -90,9 +88,28 @@ public class TaskController {
         }
     }
 
+    @PostMapping("/one")
+    public String switchUndoneToDone(@ModelAttribute Task task, Model model) {
+        try {
+            var isSwitched = taskService.switchUndoneToDone(task.getId());
+            if (!isSwitched) {
+                model.addAttribute("message", "Задача с указанным идентификатором не найдена");
+                return "errors/404";
+            }
+            return "redirect:/tasks";
+        } catch (Exception exception) {
+            model.addAttribute("message", exception.getMessage());
+            return "errors/404";
+        }
+    }
+
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable int id) {
-        taskService.delete(id);
+    public String delete(Model model, @PathVariable int id) {
+        var isDeleted = taskService.delete(id);
+        if (!isDeleted) {
+            model.addAttribute("message", "Вакансия с указанным идентификатором не найдена");
+            return "errors/404";
+        }
         return "redirect:/tasks";
     }
 }

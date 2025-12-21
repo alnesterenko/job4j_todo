@@ -11,7 +11,7 @@ public interface TaskService {
 
     boolean replace(Integer id, Task task);
 
-    void delete(Integer id);
+    boolean delete(Integer id);
 
     List<Task> findAll();
 
@@ -20,4 +20,6 @@ public interface TaskService {
     Optional<Task> findById(Integer id);
 
     List<Task> findAllByDone(boolean done);
+
+    boolean switchUndoneToDone(Integer id);
 }

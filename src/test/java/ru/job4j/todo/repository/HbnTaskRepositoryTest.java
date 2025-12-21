@@ -104,10 +104,11 @@ class HbnTaskRepositoryTest {
         Task task = new Task("Тест delete", "Протестировать метод delete(), добавив одну task-у и затем удалив её");
         Task taskAfterAdd1 = hbnTaskRepository.add(task);
         List<Task> listAfterAdd = hbnTaskRepository.findAll();
-        hbnTaskRepository.delete(taskAfterAdd1.getId());
+        boolean success = hbnTaskRepository.delete(taskAfterAdd1.getId());
         List<Task> listAfterDelete = hbnTaskRepository.findAll();
         assertThat(listAfterAdd.size()).isGreaterThan(listAfterDelete.size());
         assertThat(listAfterDelete.contains(taskAfterAdd1)).isFalse();
+        assertThat(success).isTrue();
     }
 
     @Test
@@ -115,10 +116,11 @@ class HbnTaskRepositoryTest {
         Task task = new Task("Тест delete", "Протестировать метод delete(), добавив одну task-у и затем попытаться удалить НЕ ЕЁ");
         Task taskAfterAdd1 = hbnTaskRepository.add(task);
         List<Task> listAfterAdd = hbnTaskRepository.findAll();
-        hbnTaskRepository.delete(taskAfterAdd1.getId() + 31);
+        boolean success = hbnTaskRepository.delete(taskAfterAdd1.getId() + 31);
         List<Task> listAfterDeleteFail = hbnTaskRepository.findAll();
         assertThat(listAfterAdd.size()).isEqualTo(listAfterDeleteFail.size());
         assertThat(listAfterDeleteFail.contains(taskAfterAdd1)).isTrue();
+        assertThat(success).isFalse();
     }
 
     /* Тестируем findByTitle() */
@@ -208,5 +210,51 @@ class HbnTaskRepositoryTest {
         assertThat(listByDoneFalse.get(0)).isEqualTo(task1);
         assertThat(listByDoneTrue.size()).isEqualTo(1);
         assertThat(listByDoneTrue.get(0)).isEqualTo(task2);
+    }
+
+    /* Тестируем switchUndoneToDone() */
+    @Test
+    public void whenSwitchOneTaskThenGetIt() {
+        Task task = new Task("switchUndoneToDone()", "По умолчанию task-и добавляются не выполненными.");
+        boolean beforeSwitchIsDone = task.isDone();
+        Task taskAfterAdd1 = hbnTaskRepository.add(task);
+        boolean success = hbnTaskRepository.switchUndoneToDone(taskAfterAdd1.getId());
+        List<Task> listDoneTasks = hbnTaskRepository.findAllByDone(true);
+        List<Task> listUndoneTasks = hbnTaskRepository.findAllByDone(false);
+        assertThat(success).isTrue();
+        assertThat(listDoneTasks.size()).isEqualTo(1);
+        assertThat(listUndoneTasks.size()).isEqualTo(0);
+        assertThat(beforeSwitchIsDone).isFalse();
+        assertThat(listDoneTasks.get(0).isDone()).isTrue();
+    }
+
+    @Test
+    public void whenTryToSwitchDoneTaskThenGetSameTask() {
+        Task task = new Task("switchUndoneToDone()", "Добавляем уже выполненную task-у", true);
+        boolean beforeSwitchIsDone = task.isDone();
+        Task taskAfterAdd1 = hbnTaskRepository.add(task);
+        boolean success = hbnTaskRepository.switchUndoneToDone(taskAfterAdd1.getId());
+        List<Task> listDoneTasks = hbnTaskRepository.findAllByDone(true);
+        List<Task> listUndoneTasks = hbnTaskRepository.findAllByDone(false);
+        assertThat(success).isTrue();
+        assertThat(listDoneTasks.size()).isEqualTo(1);
+        assertThat(listUndoneTasks.size()).isEqualTo(0);
+        assertThat(beforeSwitchIsDone).isTrue();
+        assertThat(listDoneTasks.get(0).isDone()).isTrue();
+    }
+
+    @Test
+    public void whenTryToSwitchOneTaskUsingWrongIdThenGetFail() {
+        Task task = new Task("switchUndoneToDone()", "По умолчанию task-и добавляются не выполненными.");
+        boolean beforeSwitchIsDone = task.isDone();
+        Task taskAfterAdd1 = hbnTaskRepository.add(task);
+        boolean success = hbnTaskRepository.switchUndoneToDone(taskAfterAdd1.getId() + 31);
+        List<Task> listDoneTasks = hbnTaskRepository.findAllByDone(true);
+        List<Task> listUndoneTasks = hbnTaskRepository.findAllByDone(false);
+        assertThat(success).isFalse();
+        assertThat(listDoneTasks.size()).isEqualTo(0);
+        assertThat(listUndoneTasks.size()).isEqualTo(1);
+        assertThat(beforeSwitchIsDone).isFalse();
+        assertThat(listUndoneTasks.get(0)).isEqualTo(task);
     }
 }
