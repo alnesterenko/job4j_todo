@@ -15,22 +15,17 @@ import static org.assertj.core.api.Assertions.*;
 class HbnTaskRepositoryTest {
     private static TaskRepository hbnTaskRepository;
 
-    public static void clearTasks() {
+    @BeforeAll
+    public static void initRepository() {
+        hbnTaskRepository = new HbnTaskRepository(new HibernateConfiguration().sf());
+    }
+
+    @AfterEach
+    public void clearTasks() {
         var tasks = hbnTaskRepository.findAll();
         for (Task oneTask : tasks) {
             hbnTaskRepository.delete(oneTask.getId());
         }
-    }
-
-    @BeforeAll
-    public static void initRepository() {
-        hbnTaskRepository = new HbnTaskRepository(new HibernateConfiguration().sf());
-        clearTasks();
-    }
-
-    @AfterEach
-    public void clear() {
-        clearTasks();
     }
 
     /* Тестируем add() */
