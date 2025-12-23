@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import net.jcip.annotations.ThreadSafe;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.User;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 
 @ThreadSafe
 @Repository
@@ -19,6 +21,8 @@ import java.util.Optional;
 public class HbnUserRepository implements UserRepository, AutoCloseable {
 
     private final SessionFactory sf;
+
+    private static Logger logger = Logger.getLogger(HbnUserRepository.class.getName());
 
     @Override
     public Optional<User> save(User user) {
@@ -29,6 +33,9 @@ public class HbnUserRepository implements UserRepository, AutoCloseable {
             session.save(user);
             session.getTransaction().commit();
             optionalUser = Optional.of(user);
+        } catch (ConstraintViolationException e) {
+            session.getTransaction().rollback();
+            logger.info("Нарушение уникального индекса или первичного ключа: " + e);
         } catch (Exception e) {
             session.getTransaction().rollback();
         } finally {
