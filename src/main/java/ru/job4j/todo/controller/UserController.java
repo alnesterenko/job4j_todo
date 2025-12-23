@@ -33,7 +33,7 @@ public class UserController {
         var userOptional = userService.save(user);
         if (userOptional.isEmpty()) {
             model.addAttribute("message", "Пользователь с такими логином и паролем уже существует");
-            return "errors/404";
+            return "errors/409";
         }
         return "redirect:/tasks";
     }
