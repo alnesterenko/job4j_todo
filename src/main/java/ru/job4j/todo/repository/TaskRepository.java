@@ -5,7 +5,7 @@ import ru.job4j.todo.model.Task;
 import java.util.List;
 import java.util.Optional;
 
-public interface TaskRepository extends AutoCloseable {
+public interface TaskRepository {
 
     Task add(Task task);
 

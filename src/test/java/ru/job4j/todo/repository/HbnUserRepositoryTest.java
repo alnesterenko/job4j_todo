@@ -18,7 +18,7 @@ class HbnUserRepositoryTest {
 
     @BeforeAll
     public static void initRepository() {
-        hbnUserRepository = new HbnUserRepository(new HibernateConfiguration().sf());
+        hbnUserRepository = new HbnUserRepository(new CrudRepository(new HibernateConfiguration().sf()));
     }
 
     @AfterEach

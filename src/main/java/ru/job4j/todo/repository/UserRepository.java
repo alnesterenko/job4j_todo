@@ -5,7 +5,7 @@ import ru.job4j.todo.model.User;
 import java.util.Collection;
 import java.util.Optional;
 
-public interface UserRepository extends AutoCloseable {
+public interface UserRepository {
 
     Optional<User> save(User user);
 

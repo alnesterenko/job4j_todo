@@ -2,150 +2,76 @@ package ru.job4j.todo.repository;
 
 import lombok.AllArgsConstructor;
 import net.jcip.annotations.ThreadSafe;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import ru.job4j.todo.model.Task;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @ThreadSafe
 @Repository
 @AllArgsConstructor
-public class HbnTaskRepository implements TaskRepository, AutoCloseable {
-    private final SessionFactory sf;
+public class HbnTaskRepository implements TaskRepository {
+    private final CrudRepository crudRepository;
 
     @Override
     public Task add(Task task) {
-        Session session = this.sf.openSession();
-        try {
-            session.beginTransaction();
-            session.save(task);
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            session.getTransaction().rollback();
-        } finally {
-            session.close();
-        }
+        crudRepository.run(session -> session.save(task));
         return task;
     }
 
     @Override
     public boolean replace(Integer id, Task task) {
-        boolean result = false;
-        Session session = this.sf.openSession();
-        try {
-            session.beginTransaction();
-            var updatedLines = session.createQuery(
-                            "UPDATE Task SET title = :title, "
-                                    + "description = :description, "
-                                    + "done = :done  WHERE id = :id")
-                    .setParameter("title", task.getTitle())
-                    .setParameter("description", task.getDescription())
-                    .setParameter("done", task.isDone())
-                    .setParameter("id", id)
-                    .executeUpdate();
-            session.getTransaction().commit();
-            result = updatedLines > 0;
-        } catch (Exception e) {
-            session.getTransaction().rollback();
-        } finally {
-            session.close();
-        }
-        return result;
+        Map<String, Object> argsMap = new HashMap<>();
+        argsMap.put("title", task.getTitle());
+        argsMap.put("description", task.getDescription());
+        argsMap.put("done", task.isDone());
+        argsMap.put("id", id);
+        int updatedLines = crudRepository.run(
+                "UPDATE Task SET title = :title, "
+                        + "description = :description, "
+                        + "done = :done  WHERE id = :id",
+                argsMap);
+        return updatedLines > 0;
     }
 
     @Override
     public boolean delete(Integer id) {
-        boolean result = false;
-        Session session = this.sf.openSession();
-        try {
-            session.beginTransaction();
-            var updatedLines = session.createQuery(
-                            "DELETE Task WHERE id = :id")
-                    .setParameter("id", id)
-                    .executeUpdate();
-            session.getTransaction().commit();
-            result = updatedLines > 0;
-        } catch (Exception e) {
-            session.getTransaction().rollback();
-        } finally {
-            session.close();
-        }
-        return result;
+        int updatedLines = crudRepository.run(
+                "DELETE Task WHERE id = :id",
+                Map.of("id", id)
+        );
+        return updatedLines > 0;
     }
 
     @Override
     public List<Task> findAll() {
-        List<Task> result = new ArrayList<>();
-        try (Session session = this.sf.openSession()) {
-            Query<Task> query = session.createQuery("SELECT t FROM Task t ORDER BY t.id ASC");
-            result = query.list();
-        }
-        return result;
+        return crudRepository.query("SELECT t FROM Task t ORDER BY t.id ASC", Task.class);
     }
 
     @Override
     public List<Task> findByTitle(String key) {
-        List<Task> result = new ArrayList<>();
-        try (Session session = this.sf.openSession()) {
-            Query<Task> query = session.createQuery(
-                    "FROM Task AS t WHERE t.title = :title", Task.class);
-            query.setParameter("title", key);
-            result = query.list();
-        }
-        return result;
+        return crudRepository.query("FROM Task AS t WHERE t.title = :title", Task.class, Map.of("title", key));
     }
 
     @Override
     public Optional<Task> findById(Integer id) {
-        try (Session session = this.sf.openSession()) {
-            Query<Task> query = session.createQuery(
-                    "FROM Task AS t WHERE t.id = :id", Task.class);
-            query.setParameter("id", id);
-            return Optional.ofNullable(query.uniqueResult());
-        }
+        return crudRepository.optional("FROM Task AS t WHERE t.id = :id", Task.class, Map.of("id", id));
     }
 
     @Override
     public List<Task> findAllByDone(boolean done) {
-        List<Task> result = new ArrayList<>();
-        try (Session session = this.sf.openSession()) {
-            Query<Task> query = session.createQuery(
-                    "FROM Task AS t WHERE t.done = :done", Task.class);
-            query.setParameter("done", done);
-            result = query.list();
-        }
-        return result;
+        return crudRepository.query("FROM Task AS t WHERE t.done = :done", Task.class, Map.of("done", done));
     }
 
     @Override
     public boolean switchUndoneToDone(Integer id) {
-        boolean result = false;
-        Session session = this.sf.openSession();
-        try {
-            session.beginTransaction();
-            var updatedLines = session.createQuery(
-                            "UPDATE Task SET done = :done  WHERE id = :id")
-                    .setParameter("done", true)
-                    .setParameter("id", id)
-                    .executeUpdate();
-            session.getTransaction().commit();
-            result = updatedLines > 0;
-        } catch (Exception e) {
-            session.getTransaction().rollback();
-        } finally {
-            session.close();
-        }
-        return result;
+        int updatedLines = crudRepository.run(
+                "UPDATE Task SET done = :done  WHERE id = :id",
+                Map.of("done", true,
+                        "id", id));
+        return updatedLines > 0;
     }
-
-    @Override
-    public void close() {
-        this.sf.close();
-    }
-
 }

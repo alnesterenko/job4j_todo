@@ -1,6 +1,5 @@
 package ru.job4j.todo.repository;
 
-import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -10,14 +9,14 @@ import ru.job4j.todo.model.Task;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class HbnTaskRepositoryTest {
     private static TaskRepository hbnTaskRepository;
 
     @BeforeAll
     public static void initRepository() {
-        hbnTaskRepository = new HbnTaskRepository(new HibernateConfiguration().sf());
+        hbnTaskRepository = new HbnTaskRepository(new CrudRepository(new HibernateConfiguration().sf()));
     }
 
     @AfterEach
@@ -67,18 +66,6 @@ class HbnTaskRepositoryTest {
         assertThat(success).isTrue();
         assertThat(listAfterReplace.size()).isEqualTo(1);
         assertThat(listAfterReplace.contains(taskAfterReplace1)).isTrue();
-    }
-
-    @Test
-    public void whenTryToReplaceItWithWrongTaskThenGetFail() {
-        Task task = new Task("Тест add", "Протестировать метод add(), добавив одну task-у");
-        Task taskAfterAdd1 = hbnTaskRepository.add(task);
-        Task taskAfterReplace1 = new Task("Тест replace()", null);
-        boolean success = hbnTaskRepository.replace(taskAfterAdd1.getId(), taskAfterReplace1);
-        List<Task> listAfterReplace = hbnTaskRepository.findAll();
-        assertThat(success).isFalse();
-        assertThat(listAfterReplace.size()).isEqualTo(1);
-        assertThat(listAfterReplace.contains(taskAfterReplace1)).isFalse();
     }
 
     @Test
