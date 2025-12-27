@@ -23,6 +23,7 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Название</th>
+                <th scope="col">Пользователь</th>
                 <th scope="col">Дата создания</th>
                 <th scope="col">Завершено</th>
             </tr>
@@ -46,6 +47,9 @@
                        style="display: block; text-decoration: none; color: inherit;"
                        th:href="@{/tasks/{taskId}(taskId=${task.id})}"/></td>
                 <td><a th:text="${task.title}"
+                       style="display: block; text-decoration: none; color: inherit;"
+                       th:href="@{/tasks/{taskId}(taskId=${task.id})}"/></td>
+                <td><a th:text="${task.user.name}"
                        style="display: block; text-decoration: none; color: inherit;"
                        th:href="@{/tasks/{taskId}(taskId=${task.id})}"/></td>
                 <!-- Чтобы дата выводилась в "красивом" формате нужно добавить ещё одни скобки -->

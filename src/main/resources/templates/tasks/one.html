@@ -18,6 +18,14 @@
                 <td th:text="${task.title}"/>
             </tr>
             <tr>
+                <th scope="row">Пользователь</th>
+                <input type="hidden" th:field="*{user.id}">
+                <input type="hidden" th:field="*{user.name}">
+                <input type="hidden" th:field="*{user.login}">
+                <input type="hidden" th:field="*{user.password}">
+                <td th:text="${task.user.name}"/>
+            </tr>
+            <tr>
                 <th scope="row">Описание</th>
                 <input type="hidden" name="description" th:field="*{description}">
                 <td th:text="${task.description}"/>

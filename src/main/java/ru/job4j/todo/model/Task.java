@@ -24,15 +24,21 @@ public class Task {
     private LocalDateTime created = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     private boolean done = false;
 
-    public Task(String title, String description) {
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public Task(String title, String description, User user) {
         this.title = title;
         this.description = description;
+        this.user = user;
     }
 
-    public Task(String title, String description, boolean done) {
+    public Task(String title, String description, boolean done, User user) {
         this.title = title;
         this.description = description;
         this.done = done;
+        this.user = user;
     }
 
     @Override
@@ -43,6 +49,7 @@ public class Task {
                 + ", description='" + description + '\''
                 + ", created=" + created.format(FORMATTER)
                 + ", done=" + done
+                + ", user=" + user
                 + '}';
     }
 }

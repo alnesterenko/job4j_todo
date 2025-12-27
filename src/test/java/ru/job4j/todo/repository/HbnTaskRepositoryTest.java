@@ -1,10 +1,12 @@
 package ru.job4j.todo.repository;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import ru.job4j.todo.configuration.HibernateConfiguration;
 import ru.job4j.todo.model.Task;
+import ru.job4j.todo.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,9 +16,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 class HbnTaskRepositoryTest {
     private static TaskRepository hbnTaskRepository;
 
+    private static UserRepository hbnUserRepository;
+
+    private static User testUser = new User("testUserName", "testUserLogin", "1234");
+
     @BeforeAll
     public static void initRepository() {
         hbnTaskRepository = new HbnTaskRepository(new CrudRepository(new HibernateConfiguration().sf()));
+        hbnUserRepository = new HbnUserRepository(new CrudRepository(new HibernateConfiguration().sf()));
+        hbnUserRepository.save(testUser);
     }
 
     @AfterEach
@@ -27,10 +35,15 @@ class HbnTaskRepositoryTest {
         }
     }
 
+    @AfterAll
+    public static void clearUsers() {
+        hbnUserRepository.deleteById(testUser.getId());
+    }
+
     /* Тестируем add() */
     @Test
     public void whenSaveThenGetSame() {
-        Task taskBeforeAdd = new Task("Тест add", "Протестировать метод add()");
+        Task taskBeforeAdd = new Task("Тест add", "Протестировать метод add()", testUser);
         List<Task> listBeforeAdd = hbnTaskRepository.findAll();
         Task taskAfterAdd = hbnTaskRepository.add(taskBeforeAdd);
         List<Task> listAfterAdd = hbnTaskRepository.findAll();
@@ -42,7 +55,7 @@ class HbnTaskRepositoryTest {
 
     @Test
     public void whenSaveOneSameSeveralThenGetAll() {
-        Task task = new Task("Тест add", "Протестировать метод add(), добавив одну и ту же task-у несколько раз");
+        Task task = new Task("Тест add", "Протестировать метод add(), добавив одну и ту же task-у несколько раз", testUser);
         List<Task> listBeforeAdd = hbnTaskRepository.findAll();
         Task taskAfterAdd1 = hbnTaskRepository.add(task);
         Task taskAfterAdd2 = hbnTaskRepository.add(task);
@@ -58,9 +71,9 @@ class HbnTaskRepositoryTest {
     /* Тестируем replace() */
     @Test
     public void whenReplaceOneTaskThenGetIt() {
-        Task task = new Task("Тест add", "Протестировать метод add(), добавив одну task-у");
+        Task task = new Task("Тест add", "Протестировать метод add(), добавив одну task-у", testUser);
         Task taskAfterAdd1 = hbnTaskRepository.add(task);
-        Task taskAfterReplace1 = new Task("Тест replace()", "Протестировать метод replace(), изменив единственную task-у");
+        Task taskAfterReplace1 = new Task("Тест replace()", "Протестировать метод replace(), изменив единственную task-у", testUser);
         boolean success = hbnTaskRepository.replace(taskAfterAdd1.getId(), taskAfterReplace1);
         List<Task> listAfterReplace = hbnTaskRepository.findAll();
         assertThat(success).isTrue();
@@ -70,9 +83,9 @@ class HbnTaskRepositoryTest {
 
     @Test
     public void whenTryToReplaceTaskUsingWrongIdThenGetFail() {
-        Task task = new Task("Тест add", "Протестировать метод add(), добавив одну task-у");
+        Task task = new Task("Тест add", "Протестировать метод add(), добавив одну task-у", testUser);
         Task taskAfterAdd1 = hbnTaskRepository.add(task);
-        Task taskAfterReplace1 = new Task("Тест replace()", "Протестировать метод replace(), изменив единственную task-у");
+        Task taskAfterReplace1 = new Task("Тест replace()", "Протестировать метод replace(), изменив единственную task-у", testUser);
         boolean success = hbnTaskRepository.replace(taskAfterAdd1.getId() + 31, taskAfterReplace1);
         List<Task> listAfterReplace = hbnTaskRepository.findAll();
         assertThat(success).isFalse();
@@ -83,7 +96,7 @@ class HbnTaskRepositoryTest {
     /* Тестируем delete() */
     @Test
     public void whenSaveOneTaskThenDeleteIt() {
-        Task task = new Task("Тест delete", "Протестировать метод delete(), добавив одну task-у и затем удалив её");
+        Task task = new Task("Тест delete", "Протестировать метод delete(), добавив одну task-у и затем удалив её", testUser);
         Task taskAfterAdd1 = hbnTaskRepository.add(task);
         List<Task> listAfterAdd = hbnTaskRepository.findAll();
         boolean success = hbnTaskRepository.delete(taskAfterAdd1.getId());
@@ -95,7 +108,7 @@ class HbnTaskRepositoryTest {
 
     @Test
     public void whenTryDeleteTaskUsingWrongId() {
-        Task task = new Task("Тест delete", "Протестировать метод delete(), добавив одну task-у и затем попытаться удалить НЕ ЕЁ");
+        Task task = new Task("Тест delete", "Протестировать метод delete(), добавив одну task-у и затем попытаться удалить НЕ ЕЁ", testUser);
         Task taskAfterAdd1 = hbnTaskRepository.add(task);
         List<Task> listAfterAdd = hbnTaskRepository.findAll();
         boolean success = hbnTaskRepository.delete(taskAfterAdd1.getId() + 31);
@@ -108,8 +121,8 @@ class HbnTaskRepositoryTest {
     /* Тестируем findByTitle() */
     @Test
     public void whenSaveTwoDifferentTasksThenGetAll() {
-        Task task1 = new Task("findByTitle1", "Протестировать метод findByTitle(), добавив две разных task-и1");
-        Task task2 = new Task("findByTitle2", "Протестировать метод findByTitle(), добавив две разных task-и2");
+        Task task1 = new Task("findByTitle1", "Протестировать метод findByTitle(), добавив две разных task-и1", testUser);
+        Task task2 = new Task("findByTitle2", "Протестировать метод findByTitle(), добавив две разных task-и2", testUser);
         hbnTaskRepository.add(task1);
         hbnTaskRepository.add(task2);
         List<Task> taskListFoundByTitle1 = hbnTaskRepository.findByTitle(task1.getTitle());
@@ -122,8 +135,8 @@ class HbnTaskRepositoryTest {
 
     @Test
     public void whenSaveTwoSameByNameTasksThenGetAll() {
-        Task task1 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и1");
-        Task task2 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и2");
+        Task task1 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и1", testUser);
+        Task task2 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и2", testUser);
         hbnTaskRepository.add(task1);
         hbnTaskRepository.add(task2);
         List<Task> taskListFoundByTitle = hbnTaskRepository.findByTitle(task1.getTitle());
@@ -135,8 +148,8 @@ class HbnTaskRepositoryTest {
 
     @Test
     public void whenTryFindByNameThenGetNoting() {
-        Task task1 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и1");
-        Task task2 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и2");
+        Task task1 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и1", testUser);
+        Task task2 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и2", testUser);
         hbnTaskRepository.add(task1);
         hbnTaskRepository.add(task2);
         List<Task> taskListFoundByTitle = hbnTaskRepository.findByTitle("noting");
@@ -145,8 +158,8 @@ class HbnTaskRepositoryTest {
 
     @Test
     public void whenTryFindByEmptyNameThenGetNoting() {
-        Task task1 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и1");
-        Task task2 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и2");
+        Task task1 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и1", testUser);
+        Task task2 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и2", testUser);
         hbnTaskRepository.add(task1);
         hbnTaskRepository.add(task2);
         List<Task> taskListFoundByTitle = hbnTaskRepository.findByTitle("");
@@ -156,8 +169,8 @@ class HbnTaskRepositoryTest {
     /* Тестируем findById() */
     @Test
     public void whenFindByIdSuccess() {
-        Task task1 = new Task("findByTitle1", "Протестировать метод findByTitle(), добавив две разных task-и1");
-        Task task2 = new Task("findByTitle2", "Протестировать метод findByTitle(), добавив две разных task-и2");
+        Task task1 = new Task("findByTitle1", "Протестировать метод findByTitle(), добавив две разных task-и1", testUser);
+        Task task2 = new Task("findByTitle2", "Протестировать метод findByTitle(), добавив две разных task-и2", testUser);
         hbnTaskRepository.add(task1);
         hbnTaskRepository.add(task2);
         Optional<Task> optionalTask1 = hbnTaskRepository.findById(task1.getId());
@@ -170,8 +183,8 @@ class HbnTaskRepositoryTest {
 
     @Test
     public void whenTryFindByWrongIdThenGetNoting() {
-        Task task1 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и1");
-        Task task2 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и2");
+        Task task1 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и1", testUser);
+        Task task2 = new Task("findByTitle", "Протестировать метод findByTitle(), добавив две разных task-и2", testUser);
         hbnTaskRepository.add(task1);
         hbnTaskRepository.add(task2);
         Optional<Task> optionalTask = hbnTaskRepository.findById(task2.getId() + 1);
@@ -182,8 +195,8 @@ class HbnTaskRepositoryTest {
     /* Тестируем findAllByDone() */
     @Test
     public void whenSaveTwoTasksWithDifferentDoneThenGetBoth() {
-        Task task1 = new Task("findByDone1", "Протестировать метод findByDone(), добавив две разных task-и1");
-        Task task2 = new Task("findByDone2", "Протестировать метод findByDone(), добавив две разных task-и2", true);
+        Task task1 = new Task("findByDone1", "Протестировать метод findByDone(), добавив две разных task-и1", testUser);
+        Task task2 = new Task("findByDone2", "Протестировать метод findByDone(), добавив две разных task-и2", true, testUser);
         hbnTaskRepository.add(task1);
         hbnTaskRepository.add(task2);
         List<Task> listByDoneFalse = hbnTaskRepository.findAllByDone(false);
@@ -197,7 +210,7 @@ class HbnTaskRepositoryTest {
     /* Тестируем switchUndoneToDone() */
     @Test
     public void whenSwitchOneTaskThenGetIt() {
-        Task task = new Task("switchUndoneToDone()", "По умолчанию task-и добавляются не выполненными.");
+        Task task = new Task("switchUndoneToDone()", "По умолчанию task-и добавляются не выполненными.", testUser);
         boolean beforeSwitchIsDone = task.isDone();
         Task taskAfterAdd1 = hbnTaskRepository.add(task);
         boolean success = hbnTaskRepository.switchUndoneToDone(taskAfterAdd1.getId());
@@ -212,7 +225,7 @@ class HbnTaskRepositoryTest {
 
     @Test
     public void whenTryToSwitchDoneTaskThenGetSameTask() {
-        Task task = new Task("switchUndoneToDone()", "Добавляем уже выполненную task-у", true);
+        Task task = new Task("switchUndoneToDone()", "Добавляем уже выполненную task-у", true, testUser);
         boolean beforeSwitchIsDone = task.isDone();
         Task taskAfterAdd1 = hbnTaskRepository.add(task);
         boolean success = hbnTaskRepository.switchUndoneToDone(taskAfterAdd1.getId());
@@ -227,7 +240,7 @@ class HbnTaskRepositoryTest {
 
     @Test
     public void whenTryToSwitchOneTaskUsingWrongIdThenGetFail() {
-        Task task = new Task("switchUndoneToDone()", "По умолчанию task-и добавляются не выполненными.");
+        Task task = new Task("switchUndoneToDone()", "По умолчанию task-и добавляются не выполненными.", testUser);
         boolean beforeSwitchIsDone = task.isDone();
         Task taskAfterAdd1 = hbnTaskRepository.add(task);
         boolean success = hbnTaskRepository.switchUndoneToDone(taskAfterAdd1.getId() + 31);

@@ -5,10 +5,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.todo.model.Task;
+import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.TaskService;
 
 @ThreadSafe
 @Controller
+@SessionAttributes("user")
 @RequestMapping({"/", "/tasks"})
 public class TaskController {
 
@@ -39,7 +41,8 @@ public class TaskController {
     }
 
     @PostMapping("/create")
-    public String create(@ModelAttribute Task task, Model model) {
+    public String create(@SessionAttribute("user") User user, @ModelAttribute Task task, Model model) {
+        task.setUser(user);
         try {
             taskService.add(task);
             return "redirect:/tasks";
