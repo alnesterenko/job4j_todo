@@ -16,6 +16,14 @@
       <textarea class="form-control" name="description" id="description" rows="6"
                 placeholder="Добавить подробное описание задачи"></textarea>
     </div>
+    <div class="mb-3">
+      <label for="priority"><b>Приоритет</b></label>
+      <select class="form-control" id="priority" name="priorityId">
+        <option th:each="priority : ${priorities}"
+                th:value="${priority.id}"
+                th:text="${priority.name}"></option>
+      </select>
+    </div>
     <div class="form-check mb-3">
       <input type="checkbox" name="done" class="form-check-input" id="done">
       <label class="form-check-label" for="done">Завершено</label>

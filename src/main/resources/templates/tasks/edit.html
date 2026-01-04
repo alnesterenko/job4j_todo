@@ -19,6 +19,15 @@
     </div>
     <!-- Нужно чтобы не заменялась дата создания -->
     <input type="hidden" name="created" th:field="*{created}" th:value="${task.created}">
+    <div class="mb-3">
+      <label for="priority"><b>Приоритет</b></label>
+      <select class="form-control" id="priority" name="priorityId">
+        <option th:each="priority : ${priorities}"
+                th:value="${priority.id}"
+                th:text="${priority.name}"
+                th:selected="${priority.id} == ${task.priority.id}"></option>
+      </select>
+    </div>
     <div class="form-check mb-3">
       <input type="checkbox" name="done" class="form-check-input" id="done" th:field="*{done}">
       <label class="form-check-label" for="done">Завершено</label>

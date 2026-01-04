@@ -25,23 +25,12 @@
                 <th scope="col">Название</th>
                 <th scope="col">Пользователь</th>
                 <th scope="col">Дата создания</th>
+                <th scope="col">Приоритет</th>
                 <th scope="col">Завершено</th>
             </tr>
             </thead>
             <tbody>
-            <!-- Временное решение чтобы посмотреть как это выглядит
-            <tr>
-                <td>1</td>
-                <td>Доделать вьюшку списка задач</td>
-                <td>2025-12-16T05:46:15</td>
-                <td>
-                    <span>
-                <i class="bi bi-check-square"></i> Завершённая задача
-              </span>
 
-                </td>
-            </tr>
-              -->
             <tr th:each="task: ${tasks}">
                 <td><a th:text="${task.id}"
                        style="display: block; text-decoration: none; color: inherit;"
@@ -54,6 +43,9 @@
                        th:href="@{/tasks/{taskId}(taskId=${task.id})}"/></td>
                 <!-- Чтобы дата выводилась в "красивом" формате нужно добавить ещё одни скобки -->
                 <td><a th:text="${{task.created}}"
+                       style="display: block; text-decoration: none; color: inherit;"
+                       th:href="@{/tasks/{taskId}(taskId=${task.id})}"/></td>
+                <td><a th:text="${task.priority.name}"
                        style="display: block; text-decoration: none; color: inherit;"
                        th:href="@{/tasks/{taskId}(taskId=${task.id})}"/></td>
                 <td><a style="display: block; text-decoration: none; color: inherit;"

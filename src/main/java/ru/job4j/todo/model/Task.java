@@ -13,7 +13,7 @@ import java.time.temporal.ChronoUnit;
 @Table(name = "tasks")
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = {"id", "done"})
+@EqualsAndHashCode(exclude = {"id", "done", "priority"})
 public class Task {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MMMM-EEEE-yyyy HH:mm:ss");
     @Id
@@ -28,17 +28,23 @@ public class Task {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Task(String title, String description, User user) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "priority_id")
+    private Priority priority;
+
+    public Task(String title, String description, User user, Priority priority) {
         this.title = title;
         this.description = description;
         this.user = user;
+        this.priority = priority;
     }
 
-    public Task(String title, String description, boolean done, User user) {
+    public Task(String title, String description, boolean done, User user, Priority priority) {
         this.title = title;
         this.description = description;
         this.done = done;
         this.user = user;
+        this.priority = priority;
     }
 
     @Override

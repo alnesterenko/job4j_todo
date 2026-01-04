@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
+import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
 
 @ThreadSafe
@@ -16,8 +17,11 @@ public class TaskController {
 
     private final TaskService taskService;
 
-    public TaskController(TaskService simpleTaskService) {
+    private final PriorityService priorityService;
+
+    public TaskController(TaskService simpleTaskService, PriorityService simplePriorityService) {
         this.taskService = simpleTaskService;
+        this.priorityService = simplePriorityService;
     }
 
     @GetMapping
@@ -37,11 +41,15 @@ public class TaskController {
     @GetMapping("/create")
     public String getCreationPage(Model model) {
         model.addAttribute("pageTitle", "Создание новой задачи");
+        model.addAttribute("priorities", priorityService.findAll());
         return "tasks/create";
     }
 
     @PostMapping("/create")
-    public String create(@SessionAttribute("user") User user, @ModelAttribute Task task, Model model) {
+    public String create(@SessionAttribute("user") User user, @ModelAttribute Task task, @RequestParam ("priorityId") Integer priorityId, Model model) {
+        var priorityOptional = priorityService.findById(priorityId);
+        /* Так как priority_id МОЖЕТ хранить значение null, если не будет найдено такого приоритета, то ошибки не будет. */
+        task.setPriority(priorityOptional.orElse(null));
         task.setUser(user);
         try {
             taskService.add(task);
@@ -72,12 +80,16 @@ public class TaskController {
             return "errors/404";
         }
         model.addAttribute("task", taskOptional.get());
+        model.addAttribute("priorities", priorityService.findAll());
         model.addAttribute("pageTitle", "Редактирование задачи");
         return "tasks/edit";
     }
 
     @PostMapping("/edit")
-    public String update(@ModelAttribute Task task, Model model) {
+    public String update(@ModelAttribute Task task, @RequestParam ("priorityId") Integer priorityId, Model model) {
+        var priorityOptional = priorityService.findById(priorityId);
+        /* Так как priority_id МОЖЕТ хранить значение null, если не будет найдено такого приоритета, то ошибки не будет. */
+        task.setPriority(priorityOptional.orElse(null));
         try {
             var isUpdated = taskService.replace(task.getId(), task);
             if (!isUpdated) {
