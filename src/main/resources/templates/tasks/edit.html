@@ -21,7 +21,7 @@
     <input type="hidden" name="created" th:field="*{created}" th:value="${task.created}">
     <div class="mb-3">
       <label for="priority"><b>Приоритет</b></label>
-      <select class="form-control" id="priority" name="priorityId">
+      <select class="form-control" id="priority" name="priority.id">
         <option th:each="priority : ${priorities}"
                 th:value="${priority.id}"
                 th:text="${priority.name}"

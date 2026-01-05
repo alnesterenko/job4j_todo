@@ -46,10 +46,8 @@ public class TaskController {
     }
 
     @PostMapping("/create")
-    public String create(@SessionAttribute("user") User user, @ModelAttribute Task task, @RequestParam ("priorityId") Integer priorityId, Model model) {
-        var priorityOptional = priorityService.findById(priorityId);
-        /* Так как priority_id МОЖЕТ хранить значение null, если не будет найдено такого приоритета, то ошибки не будет. */
-        task.setPriority(priorityOptional.orElse(null));
+    public String create(@SessionAttribute("user") User user, @ModelAttribute Task task, Model model) {
+        /* "Магическая" фигня с priority в контроллере */
         task.setUser(user);
         try {
             taskService.add(task);
@@ -86,10 +84,7 @@ public class TaskController {
     }
 
     @PostMapping("/edit")
-    public String update(@ModelAttribute Task task, @RequestParam ("priorityId") Integer priorityId, Model model) {
-        var priorityOptional = priorityService.findById(priorityId);
-        /* Так как priority_id МОЖЕТ хранить значение null, если не будет найдено такого приоритета, то ошибки не будет. */
-        task.setPriority(priorityOptional.orElse(null));
+    public String update(@ModelAttribute Task task, Model model) {
         try {
             var isUpdated = taskService.replace(task.getId(), task);
             if (!isUpdated) {

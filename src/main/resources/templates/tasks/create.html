@@ -18,7 +18,8 @@
     </div>
     <div class="mb-3">
       <label for="priority"><b>Приоритет</b></label>
-      <select class="form-control" id="priority" name="priorityId">
+      <!-- "Магическая" фигня с priority во вьюшке (в форме) -->
+      <select class="form-control" id="priority" name="priority.id">
         <option th:each="priority : ${priorities}"
                 th:value="${priority.id}"
                 th:text="${priority.name}"></option>

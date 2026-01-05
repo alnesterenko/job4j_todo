@@ -19,7 +19,7 @@ public class ToDoRun {
             var stored = listOf("FROM Task", Task.class, sf);*/
             /* А вот так правильно ! */
             var stored = listOf("FROM Task f JOIN FETCH f.priority", Task.class, sf);
-            for (Task task:stored) {
+            for (Task task : stored) {
                 System.out.println(task.getPriority());
             }
         } catch (Exception e) {
@@ -36,10 +36,4 @@ public class ToDoRun {
         session.close();
         return rsl;
     }
-
-    /*public static <T> void printAllTasks(List<T> taskList) {
-        SessionFactory sf=new MetadataSources(registry).buildMetadata().buildSessionFactory();
-        var stored=listOf("FROM Task",Task.class,sf);
-
-    }*/
 }
