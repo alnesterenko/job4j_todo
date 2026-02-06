@@ -63,4 +63,12 @@ public class HbnUserRepository implements UserRepository {
                 Map.of("id", id)
         );
     }
+
+    @Override
+    public void clearRepository() {
+        var users = findAll();
+        for (User oneUser : users) {
+            deleteById(oneUser.getId());
+        }
+    }
 }

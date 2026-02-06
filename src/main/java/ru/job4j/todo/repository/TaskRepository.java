@@ -22,4 +22,8 @@ public interface TaskRepository {
     List<Task> findAllByDone(boolean done);
 
     boolean switchUndoneToDone(Integer id);
+
+    /* Добавлено для удобства тестирования */
+
+    void clearRepository();
 }

@@ -16,4 +16,6 @@ public interface PriorityRepository {
     Priority add(Priority priority);
 
     boolean delete(Integer id);
+
+    void clearRepository();
 }

@@ -28,10 +28,7 @@ class HbnPriorityRepositoryTest {
 
     @AfterEach
     public void clearPriorities() {
-        var priorities = priorityRepository.findAll();
-        for (Priority onePriority : priorities) {
-            priorityRepository.delete(onePriority.getId());
-        }
+        priorityRepository.clearRepository();
     }
 
     /* Тестируем add() */
@@ -74,7 +71,6 @@ class HbnPriorityRepositoryTest {
         priorityRepository.add(secondPriority);
         Optional<Priority> optionalPriority = priorityRepository.findById(secondPriority.getId() + 31);
         assertThat(optionalPriority.isPresent()).isFalse();
-        assertThat(optionalPriority.isEmpty()).isTrue();
     }
 
     /* Тестируем delete() */

@@ -39,4 +39,12 @@ public class HbnPriorityRepository implements PriorityRepository {
         );
         return updatedLines > 0;
     }
+
+    @Override
+    public void clearRepository() {
+        var priorities = findAll();
+        for (Priority onePriority : priorities) {
+            delete(onePriority.getId());
+        }
+    }
 }

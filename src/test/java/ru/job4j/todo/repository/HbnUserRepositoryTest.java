@@ -23,10 +23,7 @@ class HbnUserRepositoryTest {
 
     @AfterEach
     public void clearUsers() {
-        var users = hbnUserRepository.findAll();
-        for (User oneUser : users) {
-            hbnUserRepository.deleteById(oneUser.getId());
-        }
+        hbnUserRepository.clearRepository();
     }
 
     @Test

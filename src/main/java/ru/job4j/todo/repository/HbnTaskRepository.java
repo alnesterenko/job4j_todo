@@ -76,4 +76,12 @@ public class HbnTaskRepository implements TaskRepository {
                         "id", id));
         return updatedLines > 0;
     }
+
+    @Override
+    public void clearRepository() {
+        var tasks = findAll();
+        for (Task oneTask : tasks) {
+            delete(oneTask.getId());
+        }
+    }
 }

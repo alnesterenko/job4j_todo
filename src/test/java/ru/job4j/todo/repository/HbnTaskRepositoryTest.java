@@ -30,21 +30,24 @@ class HbnTaskRepositoryTest {
         hbnTaskRepository = new HbnTaskRepository(crudRepository);
         hbnUserRepository = new HbnUserRepository(crudRepository);
         hbnPriorityRepository = new HbnPriorityRepository(crudRepository);
+
+        hbnUserRepository.clearRepository();
         hbnUserRepository.save(testUser);
+
+        hbnPriorityRepository.clearRepository();
         hbnPriorityRepository.add(testFirstPriority);
     }
 
     @AfterEach
     public void clearTasks() {
-        var tasks = hbnTaskRepository.findAll();
-        for (Task oneTask : tasks) {
-            hbnTaskRepository.delete(oneTask.getId());
-        }
+        hbnTaskRepository.clearRepository();
     }
 
+    /* Обязательно очищаем тестовые БД, потому, что после "неудачных дублей" записи остаются в БД */
     @AfterAll
-    public static void clearUsers() {
-        hbnUserRepository.deleteById(testUser.getId());
+    public static void clearAnoterRepositories() {
+        hbnUserRepository.clearRepository();
+        hbnPriorityRepository.clearRepository();
     }
 
     /* Тестируем add() */
@@ -196,7 +199,6 @@ class HbnTaskRepositoryTest {
         hbnTaskRepository.add(task2);
         Optional<Task> optionalTask = hbnTaskRepository.findById(task2.getId() + 1);
         assertThat(optionalTask.isPresent()).isFalse();
-        assertThat(optionalTask.isEmpty()).isTrue();
     }
 
     /* Тестируем findAllByDone() */
