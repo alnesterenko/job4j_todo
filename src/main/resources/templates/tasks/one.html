@@ -38,9 +38,16 @@
             <tr>
                 <th scope="row">Приоритет</th>
                 <input type="hidden" th:field="*{priority.id}">
-                <input type="hidden" th:field="*{priority.name}">
-                <input type="hidden" th:field="*{priority.position}">
                 <td th:text="${task.priority.name}"/>
+            </tr>
+            <tr>
+                <th scope="row">Категории</th>
+                <input type="hidden" name="categoryIds">
+                <td>
+                    <nobr th:each="category, stat : ${task.categories}">
+                        <span th:text="${category.name}"></span><span th:if="${!stat.last}">, </span>
+                    </nobr>
+                </td>
             </tr>
             <tr>
                 <th scope="row">Завершено</th>

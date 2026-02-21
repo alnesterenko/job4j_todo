@@ -8,12 +8,14 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tasks")
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = {"id", "done", "priority"})
+@EqualsAndHashCode(exclude = {"id", "done", "priority", "categories"})
 public class Task {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd-MMMM-EEEE-yyyy HH:mm:ss");
     @Id
@@ -32,6 +34,14 @@ public class Task {
     @JoinColumn(name = "priority_id")
     private Priority priority;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "task_category_links",
+            joinColumns = { @JoinColumn(name = "task_id") },
+            inverseJoinColumns = { @JoinColumn(name = "category_id") }
+    )
+    private List<Category> categories = new ArrayList<>();
+
     public Task(String title, String description, User user, Priority priority) {
         this.title = title;
         this.description = description;
@@ -47,6 +57,23 @@ public class Task {
         this.priority = priority;
     }
 
+    public Task(String title, String description, User user, Priority priority, List<Category> categories) {
+        this.title = title;
+        this.description = description;
+        this.user = user;
+        this.priority = priority;
+        this.categories = categories;
+    }
+
+    public Task(String title, String description, boolean done, User user, Priority priority, List<Category> categories) {
+        this.title = title;
+        this.description = description;
+        this.done = done;
+        this.user = user;
+        this.priority = priority;
+        this.categories = categories;
+    }
+
     @Override
     public String toString() {
         return "Task{"
@@ -56,6 +83,31 @@ public class Task {
                 + ", created=" + created.format(FORMATTER)
                 + ", done=" + done
                 + ", user=" + user
+                + ", categories=" + categories
                 + '}';
+    }
+
+    public void addCategory(Category category) {
+        if (category != null && !categories.contains(category)) {
+            categories.add(category);
+        }
+    }
+
+    public void removeCategory(Category category) {
+        if (category != null && categories.contains(category)) {
+            categories.remove(category);
+        }
+    }
+
+    public void addManyCategories(List<Category> categoryList) {
+        for (Category oneCategory : categoryList) {
+            addCategory(oneCategory);
+        }
+    }
+
+    public void removeManyCategories(List<Category> categoryList) {
+        for (Category oneCategory : categoryList) {
+            removeCategory(oneCategory);
+        }
     }
 }

@@ -6,8 +6,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.job4j.todo.model.Task;
 import ru.job4j.todo.model.User;
+import ru.job4j.todo.service.CategoryService;
 import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
+
+import java.util.List;
 
 @ThreadSafe
 @Controller
@@ -19,11 +22,19 @@ public class TaskController {
 
     private final PriorityService priorityService;
 
-    public TaskController(TaskService simpleTaskService, PriorityService simplePriorityService) {
+    private final CategoryService categoryService;
+
+    public TaskController(
+            TaskService simpleTaskService,
+            PriorityService simplePriorityService,
+            CategoryService simpleCategoryService
+    ) {
         this.taskService = simpleTaskService;
         this.priorityService = simplePriorityService;
+        this.categoryService = simpleCategoryService;
     }
 
+    /* Вывод всех задач */
     @GetMapping
     public String getAll(Model model) {
         model.addAttribute("tasks", taskService.findAll());
@@ -31,6 +42,7 @@ public class TaskController {
         return "index";
     }
 
+    /* Вывод только выполненных/не выполненных задач */
     @GetMapping("/done/{done}")
     public String getAllByDone(Model model, @PathVariable boolean done) {
         model.addAttribute("tasks", taskService.findAllByDone(done));
@@ -38,17 +50,23 @@ public class TaskController {
         return "index";
     }
 
+    /* Создание задачи */
     @GetMapping("/create")
     public String getCreationPage(Model model) {
-        model.addAttribute("pageTitle", "Создание новой задачи");
         model.addAttribute("priorities", priorityService.findAll());
+        model.addAttribute("categories", categoryService.findAll());
+        model.addAttribute("pageTitle", "Создание новой задачи");
         return "tasks/create";
     }
 
     @PostMapping("/create")
-    public String create(@SessionAttribute("user") User user, @ModelAttribute Task task, Model model) {
-        /* "Магическая" фигня с priority в контроллере */
+    public String create(
+            @SessionAttribute("user") User user,
+            @RequestParam(value = "categoryIds", required = false) List<Integer> categoryIds,
+            @ModelAttribute Task task,
+            Model model) {
         task.setUser(user);
+        task.setCategories(categoryService.findAllByIds(categoryIds));
         try {
             taskService.add(task);
             return "redirect:/tasks";
@@ -58,6 +76,7 @@ public class TaskController {
         }
     }
 
+    /* Вывод одной задачи */
     @GetMapping("/{id}")
     public String getById(Model model, @PathVariable int id) {
         var taskOptional = taskService.findById(id);
@@ -70,6 +89,7 @@ public class TaskController {
         return "tasks/one";
     }
 
+    /* Редактированние задачи */
     @GetMapping("/edit/{id}")
     public String getEditPage(Model model, @PathVariable int id) {
         var taskOptional = taskService.findById(id);
@@ -79,13 +99,18 @@ public class TaskController {
         }
         model.addAttribute("task", taskOptional.get());
         model.addAttribute("priorities", priorityService.findAll());
+        model.addAttribute("categories", categoryService.findAll());
         model.addAttribute("pageTitle", "Редактирование задачи");
         return "tasks/edit";
     }
 
     @PostMapping("/edit")
-    public String update(@ModelAttribute Task task, Model model) {
+    public String update(
+            @ModelAttribute Task task,
+            @RequestParam(value = "categoryIds", required = false) List<Integer> categoryIds,
+            Model model) {
         try {
+            task.setCategories(categoryService.findAllByIds(categoryIds));
             var isUpdated = taskService.replace(task.getId(), task);
             if (!isUpdated) {
                 model.addAttribute("message", "Задача с указанным идентификатором не найдена");
@@ -98,6 +123,8 @@ public class TaskController {
         }
     }
 
+    /* Одностороннее переключение статуса задачи на "выполнена".
+     Переключить обратно на "не выполнена" можно на странице редактирования */
     @PostMapping("/one")
     public String switchUndoneToDone(@ModelAttribute Task task, Model model) {
         try {
@@ -113,6 +140,7 @@ public class TaskController {
         }
     }
 
+    /* Удаление задачи */
     @GetMapping("/delete/{id}")
     public String delete(Model model, @PathVariable int id) {
         var isDeleted = taskService.delete(id);
