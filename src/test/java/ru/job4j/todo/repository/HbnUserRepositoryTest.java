@@ -90,5 +90,4 @@ class HbnUserRepositoryTest {
         assertThat(listOfUsers.contains(userFoundByLoginAndPassword)).isTrue();
         assertThat(userFoundByLoginAndPassword).isEqualTo(firstUser);
     }
-
 }

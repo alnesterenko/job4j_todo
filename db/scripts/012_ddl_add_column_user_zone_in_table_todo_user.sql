@@ -1,0 +1,1 @@
+ALTER TABLE todo_user ADD COLUMN user_zone VARCHAR(256);

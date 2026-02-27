@@ -6,7 +6,6 @@ import ru.job4j.todo.model.User;
 import ru.job4j.todo.repository.UserRepository;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
 
 @ThreadSafe

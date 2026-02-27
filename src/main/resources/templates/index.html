@@ -42,8 +42,7 @@
                 <td><a th:text="${task.user.name}"
                        style="display: block; text-decoration: none; color: inherit;"
                        th:href="@{/tasks/{taskId}(taskId=${task.id})}"/></td>
-                <!-- Чтобы дата выводилась в "красивом" формате нужно добавить ещё одни скобки -->
-                <td><a th:text="${{task.created}}"
+                <td><a th:text="${#temporals.format(task.created, 'HH:mm dd-MM-yyyy')}"
                        style="display: block; text-decoration: none; color: inherit;"
                        th:href="@{/tasks/{taskId}(taskId=${task.id})}"/></td>
                 <td><a th:text="${task.priority.name}"

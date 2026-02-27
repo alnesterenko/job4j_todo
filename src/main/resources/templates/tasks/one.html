@@ -33,7 +33,7 @@
             <tr>
                 <th scope="row">Дата создания</th>
                 <input type="hidden" name="created" th:field="*{created}">
-                <td th:text="${{task.created}}"/>
+                <td th:text="${#temporals.format(task.created, 'HH:mm dd-MM-yyyy')}"/>
             </tr>
             <tr>
                 <th scope="row">Приоритет</th>

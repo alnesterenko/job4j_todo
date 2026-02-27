@@ -20,9 +20,19 @@ public class User {
     private String login;
     private String password;
 
+    @Column(name = "user_zone")
+    private String timezone;
+
     public User(String name, String login, String password) {
         this.name = name;
         this.login = login;
         this.password = password;
+    }
+
+    public User(String name, String login, String password, String timezone) {
+        this.name = name;
+        this.login = login;
+        this.password = password;
+        this.timezone = timezone;
     }
 }

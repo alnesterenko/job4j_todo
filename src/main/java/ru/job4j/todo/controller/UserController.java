@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.UserService;
+import ru.job4j.todo.utility.LocalDateTimeConverter;
+
+import java.util.TimeZone;
 
 @ThreadSafe
 @Controller
@@ -24,7 +27,11 @@ public class UserController {
     }
 
     @GetMapping("/register")
-    public String getRegistrationPage() {
+    public String getRegistrationPage(Model model) {
+        model.addAttribute("timeZones", userService.createAvailableTimeZonesList());
+        model.addAttribute("pageTitle", "Регистрация");
+        /* Добавляем часовой пояс по умолчанию, который будет выбран, если ползователь не выберет часовой пояс */
+        model.addAttribute("defaultTimeZoneId", TimeZone.getDefault().getID());
         return "users/register";
     }
 
@@ -51,7 +58,9 @@ public class UserController {
             return "users/login";
         }
         var session = request.getSession();
-        session.setAttribute("user", userOptional.get());
+        /* Прежде чем записать user-а в сессию, проверяем и если отсутствует устанавливаем timezone */
+        user = LocalDateTimeConverter.checkAndSetDefaultUserTimezone(userOptional.get());
+        session.setAttribute("user", user);
         return "redirect:/tasks";
     }
 

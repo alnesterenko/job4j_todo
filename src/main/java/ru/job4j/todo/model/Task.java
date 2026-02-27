@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class Task {
     private Integer id;
     private String title;
     private String description;
-    private LocalDateTime created = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    private LocalDateTime created = LocalDateTime.now(ZoneId.of("UTC")).truncatedTo(ChronoUnit.SECONDS);
     private boolean done = false;
 
     @ManyToOne
@@ -85,29 +86,5 @@ public class Task {
                 + ", user=" + user
                 + ", categories=" + categories
                 + '}';
-    }
-
-    public void addCategory(Category category) {
-        if (category != null && !categories.contains(category)) {
-            categories.add(category);
-        }
-    }
-
-    public void removeCategory(Category category) {
-        if (category != null && categories.contains(category)) {
-            categories.remove(category);
-        }
-    }
-
-    public void addManyCategories(List<Category> categoryList) {
-        for (Category oneCategory : categoryList) {
-            addCategory(oneCategory);
-        }
-    }
-
-    public void removeManyCategories(List<Category> categoryList) {
-        for (Category oneCategory : categoryList) {
-            removeCategory(oneCategory);
-        }
     }
 }

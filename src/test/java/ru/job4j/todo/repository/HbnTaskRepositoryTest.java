@@ -1,6 +1,9 @@
 package ru.job4j.todo.repository;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import ru.job4j.todo.configuration.HibernateConfiguration;
 import ru.job4j.todo.model.Category;
 import ru.job4j.todo.model.Priority;
@@ -10,7 +13,7 @@ import ru.job4j.todo.model.User;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class HbnTaskRepositoryTest {
     private static TaskRepository hbnTaskRepository;

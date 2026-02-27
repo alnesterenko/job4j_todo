@@ -9,6 +9,7 @@ import ru.job4j.todo.model.User;
 import ru.job4j.todo.service.CategoryService;
 import ru.job4j.todo.service.PriorityService;
 import ru.job4j.todo.service.TaskService;
+import ru.job4j.todo.utility.LocalDateTimeConverter;
 
 import java.util.List;
 
@@ -36,16 +37,18 @@ public class TaskController {
 
     /* Вывод всех задач */
     @GetMapping
-    public String getAll(Model model) {
-        model.addAttribute("tasks", taskService.findAll());
+    public String getAll(@SessionAttribute("user") User user, Model model) {
+        List<Task> convertedTaskList = LocalDateTimeConverter.convertTimeCreatedTaskList(taskService.findAll(), user.getTimezone());
+        model.addAttribute("tasks", convertedTaskList);
         model.addAttribute("pageTitle", "Все задачи");
         return "index";
     }
 
     /* Вывод только выполненных/не выполненных задач */
     @GetMapping("/done/{done}")
-    public String getAllByDone(Model model, @PathVariable boolean done) {
-        model.addAttribute("tasks", taskService.findAllByDone(done));
+    public String getAllByDone(@SessionAttribute("user") User user, Model model, @PathVariable boolean done) {
+        List<Task> convertedTaskList = LocalDateTimeConverter.convertTimeCreatedTaskList(taskService.findAllByDone(done), user.getTimezone());
+        model.addAttribute("tasks", convertedTaskList);
         model.addAttribute("pageTitle", "Только выполненные/не выполненные задачи");
         return "index";
     }
@@ -78,13 +81,14 @@ public class TaskController {
 
     /* Вывод одной задачи */
     @GetMapping("/{id}")
-    public String getById(Model model, @PathVariable int id) {
+    public String getById(@SessionAttribute("user") User user, Model model, @PathVariable int id) {
         var taskOptional = taskService.findById(id);
         if (taskOptional.isEmpty()) {
             model.addAttribute("message", "Задача с указанным идентификатором не найдена");
             return "errors/404";
         }
-        model.addAttribute("task", taskOptional.get());
+        Task convertedTask = LocalDateTimeConverter.convertTimeCreatedOneTask(taskOptional.get(), user.getTimezone());
+        model.addAttribute("task", convertedTask);
         model.addAttribute("pageTitle", "Одна задача");
         return "tasks/one";
     }
